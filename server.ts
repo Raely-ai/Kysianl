@@ -1,16 +1,14 @@
 import express from "express";
 import path from "path";
-import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
 import fs from "fs";
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const ROOT_DIR = process.cwd();
 
 // Ensure you have the config (use relative path from where server runs, or dynamically parse)
-const firebaseConfigRaw = fs.readFileSync(path.resolve(process.cwd(), 'firebase-applet-config.json'), 'utf-8');
+const firebaseConfigRaw = fs.readFileSync(path.resolve(ROOT_DIR, 'firebase-applet-config.json'), 'utf-8');
 const firebaseConfig = JSON.parse(firebaseConfigRaw);
 
 const appFirebase = initializeApp(firebaseConfig);
@@ -128,7 +126,7 @@ async function startServer() {
         if (url.startsWith('/api/')) return next();
 
         // Template'i Vite'dan alıyoruz
-        let template = fs.readFileSync(path.resolve(__dirname, 'index.html'), 'utf-8');
+        let template = fs.readFileSync(path.resolve(ROOT_DIR, 'index.html'), 'utf-8');
         template = await vite.transformIndexHtml(url, template);
 
         // Başlıkları değiştirip SEO'yu güçlendirebiliriz
