@@ -1,9 +1,4 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import Home from './pages/Home';
 import NewsDetail from './pages/NewsDetail';
@@ -13,31 +8,28 @@ import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminLogin from './pages/admin/AdminLogin';
 
+function PublicLayout() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-grow">
+        <Outlet />
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <HelmetProvider>
       <BrowserRouter>
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={
-            <div className="flex flex-col min-h-screen">
-              <Header />
-              <main className="flex-grow">
-                <Home />
-              </main>
-              <Footer />
-            </div>
-          } />
-          
-          <Route path="/haber/:slug" element={
-            <div className="flex flex-col min-h-screen">
-              <Header />
-              <main className="flex-grow">
-                <NewsDetail />
-              </main>
-              <Footer />
-            </div>
-          } />
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/haber/:slug" element={<NewsDetail />} />
+          </Route>
 
           {/* Admin API Routes - No Header/Footer */}
           <Route path="/admin/login" element={<AdminLogin />} />

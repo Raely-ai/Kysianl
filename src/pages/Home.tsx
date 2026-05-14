@@ -79,7 +79,9 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {newsList.map((news) => (
-              <NewsCard key={`grid-${news.id}`} news={news} />
+              <div key={`grid-${news?.id || Math.random()}`}>
+                <NewsCard news={news} />
+              </div>
             ))}
           </div>
       </div>

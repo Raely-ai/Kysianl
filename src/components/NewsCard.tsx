@@ -19,7 +19,12 @@ interface NewsCardProps {
 }
 
 export default function NewsCard({ news, featured = false }: NewsCardProps) {
-  const timeAgo = formatDistanceToNow(news.createdAt, { addSuffix: true, locale: tr });
+  let timeAgo = "";
+  try {
+    timeAgo = news?.createdAt ? formatDistanceToNow(news.createdAt, { addSuffix: true, locale: tr }) : "";
+  } catch (e) {
+    timeAgo = "";
+  }
 
   // Büyük/Manşet kartı (Öne çıkan haber)
   if (featured) {

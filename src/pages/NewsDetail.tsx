@@ -52,7 +52,12 @@ export default function NewsDetail() {
      );
   }
 
-  const timeAgo = formatDistanceToNow(news.createdAt, { addSuffix: true, locale: tr });
+  let timeAgo = "";
+  try {
+    timeAgo = news?.createdAt ? formatDistanceToNow(news.createdAt, { addSuffix: true, locale: tr }) : "";
+  } catch (e) {
+    timeAgo = "";
+  }
 
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
@@ -64,8 +69,8 @@ export default function NewsDetail() {
       
       {/* Category & Time */}
       <div className="flex items-center gap-3 mb-6">
-        <Link to={`/kategori/${news.category.toLowerCase()}`} className="text-red-700 font-bold uppercase tracking-wider text-sm hover:underline">
-          {news.category}
+        <Link to={`/kategori/${news?.category?.toLowerCase?.() || ''}`} className="text-red-700 font-bold uppercase tracking-wider text-sm hover:underline">
+          {news.category || 'Haber'}
         </Link>
         <span className="text-gray-400">&bull;</span>
         <span className="text-gray-500 text-sm">{timeAgo}</span>
