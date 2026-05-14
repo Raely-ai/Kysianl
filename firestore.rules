@@ -1,56 +1,101 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && (request.auth.token.email == "admin@kayserianlik.com" || request.auth.token.email == "hpferdicakir@gmail.com");
+    }
+
     // Global Safety Net
     match /{document=**} {
       allow read, write: if false;
     }
-    
-    // Primitive Definition
-    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
-    function incoming() { return request.resource.data; }
-    function existing() { return resource.data; }
-    function isSignedIn() { return request.auth != null; }
-    
-    // We will consider the user to be admin if they are registered in the userRoles collection
-    function isAdmin() {
-      return isSignedIn() && exists(/databases/$(database)/documents/userRoles/$(request.auth.uid));
-    }
-    
-    // Validation Blueprints
-    function isValidNews(data) {
-      return data.keys().hasAll(['title', 'slug', 'summary', 'category', 'status', 'createdAt']) &&
-             data.title is string && data.title.size() <= 200 && data.title.size() > 0 &&
-             data.slug is string && data.slug.size() <= 200 && data.slug.size() > 0 &&
-             data.summary is string && data.summary.size() <= 500 &&
-             data.category is string && data.category.size() <= 50 &&
-             data.status is string && data.status in ['draft', 'published'] &&
-             data.createdAt is number &&
-             (data.keys().hasAny(['content']) ? data.content is string : true) &&
-             (data.keys().hasAny(['imageUrl']) ? data.imageUrl is string : true) &&
-             (data.keys().hasAny(['isBreaking']) ? data.isBreaking is bool : true) &&
-             (data.keys().hasAny(['updatedAt']) ? data.updatedAt is number : true) &&
-             (data.keys().hasAny(['authorId']) ? data.authorId is string : true);
-    }
-    
-    // Match News
+
     match /news/{newsId} {
-      // Anyone can read published news, but only admins can list all (including drafts)
-      allow get: if (existing().status == 'published') || isAdmin();
-      allow list: if (existing().status == 'published') || isAdmin();
-      
-      allow create: if isSignedIn() && isAdmin() && isValidId(newsId) && isValidNews(incoming());
-      
-      allow update: if isSignedIn() && isAdmin() && isValidNews(incoming());
-      
-      allow delete: if isSignedIn() && isAdmin();
+      allow read: if resource.data.status == "published" || isAdmin();
+      allow create, update, delete: if isAdmin();
     }
-    
-    // Match User Roles
-    match /userRoles/{userId} {
-      allow read: if isSignedIn() && request.auth.uid == userId || isAdmin();
-      allow write: if false; // Only manageable through manual database intervention or separated admin app
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /businesses/{businessId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /events/{eventId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /announcements/{announcementId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /campaigns/{campaignId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /blogPosts/{postId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /places/{placeId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /pharmacies/{pharmacyId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /ads/{adId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /homepageBlocks/{blockId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /homepageLayouts/{layoutId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /siteLayouts/{layoutId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /customBlocks/{blockId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /menuItems/{menuId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
     }
   }
 }
+

@@ -12,10 +12,25 @@ export default function AdminLogin() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      localStorage.removeItem('demoAdmin');
       navigate('/admin');
     } catch (err: any) {
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.message.includes('auth/')) {
+        // Otomatik admin kaydı (Eğer daha önce oluşturulmamışsa test hesabını aç)
+        if (email === 'admin@kayserianlik.com') {
+           try {
+             const { createUserWithEmailAndPassword } = await import('firebase/auth');
+             await createUserWithEmailAndPassword(auth, email, password);
+             navigate('/admin');
+             return;
+           } catch (createErr) {
+             console.error("Otomatik kullanıcı oluşturulamadı", createErr);
+           }
+        }
+      }
       setError("Giriş başarısız. Bilgilerinizi kontrol ediniz.");
       console.error(err);
     }
@@ -31,6 +46,11 @@ export default function AdminLogin() {
           <p className="mt-2 text-center text-sm text-gray-600">
             Editör & Yönetici Paneli
           </p>
+          <div className="mt-4 p-3 bg-blue-50 text-blue-800 text-xs rounded border border-blue-100 italic text-center">
+            Test Hesabı: <br />
+            <strong>admin@kayserianlik.com</strong> <br />
+            <strong>Kayseri123!</strong>
+          </div>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           {error && <div className="text-red-500 text-sm text-center bg-red-50 p-2 rounded">{error}</div>}
