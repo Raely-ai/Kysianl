@@ -1,0 +1,43 @@
+{
+  "entities": {
+    "News": {
+      "title": "News",
+      "description": "A news article",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "summary": { "type": "string" },
+        "content": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "category": { "type": "string" },
+        "status": { "type": "string", "enum": ["draft", "published"] },
+        "isBreaking": { "type": "boolean" },
+        "authorId": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["title", "slug", "summary", "category", "status", "createdAt"]
+    },
+    "UserAuth": {
+      "title": "UserAuth",
+      "description": "User Roles for Admin",
+      "type": "object",
+      "properties": {
+        "role": { "type": "string", "enum": ["admin", "editor"] },
+        "email": { "type": "string" }
+      },
+      "required": ["role", "email"]
+    }
+  },
+  "firestore": {
+    "news": {
+      "schema": { "$ref": "#/entities/News" },
+      "description": "Collection of all news articles in the system"
+    },
+    "userRoles": {
+      "schema": { "$ref": "#/entities/UserAuth" },
+      "description": "Defines user roles for access control"
+    }
+  }
+}
